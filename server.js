@@ -5,8 +5,6 @@ const port = process.env.PORT || 5000;
 
 const connectDB = require("./src/config/db.js");
 
-console.log(port);
-
 
 connectDB();
 
