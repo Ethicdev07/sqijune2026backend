@@ -11,5 +11,4 @@ router.route("/verify/:email/:verificationToken").get(authController.verifyEmail
 
 
 
-
 module.exports = router;
