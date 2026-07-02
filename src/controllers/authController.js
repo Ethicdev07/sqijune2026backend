@@ -4,7 +4,7 @@ const signJwt = require("../utils/signJwt");
 const sendEmail = require("../utils/email");
 const crypto = require("crypto");
 const AppError = require("../utils/AppError");
-const { validateUserSignup } = require("../validation/userValidation");
+const { validateUserSignup, validateUserLogin } = require("../validation/userValidation");
 
 const signUp = async (req, res, next) => {
   try {
@@ -154,8 +154,67 @@ const verifyEmailAddress = async(req, res, next)=>{
 };
 
 
+const login = async(req, res, next) => {
+
+  try {
+
+    const loginValidation = validateUserLogin(req.body);
+
+    if(loginValidation?.error){
+      throw new AppError(loginValidation?.error.message, 400)
+    }
+
+    const {email, password} = req.body;
+
+    if(!email || !password){
+      throw new AppError("Invalid Email or Password");
+    };
+
+    //check if user exist
+    const user = await Users.findOne({ email }).select("+password");
+
+    if(!user){
+      throw new AppError("User not found!", 404)
+    };
+
+    //check if user email is verified
+    if(!user.email_verified){
+      throw new AppError("Kindly verify email", 401);
+    };
+
+    //check is user password matches the hashed password
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if(!isMatch){
+      throw new AppError("Invalid login Credentails")
+    };
+
+    //check for user token
+    const token = signJwt(user._id)
+
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        user, 
+        token
+      }
+    });
+
+    
+  } catch (error) {
+    next(error);
+    res.status(404).json({
+      status: "failed",
+      message: error.message
+    })
+  }
+
+}
+
 
 module.exports = {
   signUp,
-  verifyEmailAddress
+  verifyEmailAddress,
+  login
 };
