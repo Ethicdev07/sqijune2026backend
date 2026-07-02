@@ -4,7 +4,10 @@ const signJwt = require("../utils/signJwt");
 const sendEmail = require("../utils/email");
 const crypto = require("crypto");
 const AppError = require("../utils/AppError");
-const { validateUserSignup, validateUserLogin } = require("../validation/userValidation");
+const {
+  validateUserSignup,
+  validateUserLogin,
+} = require("../validation/userValidation");
 
 const signUp = async (req, res, next) => {
   try {
@@ -102,119 +105,105 @@ const signUp = async (req, res, next) => {
   }
 };
 
-const verifyEmailAddress = async(req, res, next)=>{
+const verifyEmailAddress = async (req, res, next) => {
   try {
+    const { email, verificationToken } = req.params;
 
-    const {email, verificationToken} = req.params;
-
-    if(!email || !verificationToken){
-      throw new AppError("Provide email and token")
-    };
+    if (!email || !verificationToken) {
+      throw new AppError("Provide email and token");
+    }
 
     //check if user email exist
 
     const user = await Users.findOne({ email });
 
-    if(!user){
+    if (!user) {
       throw new AppError("User not found");
-      
-    };
-
+    }
 
     const tokenValid = await bcrypt.compare(
-       verificationToken,
-      user.verification_token
-    )
+      verificationToken,
+      user.verification_token,
+    );
 
-    if(!tokenValid){
+    if (!tokenValid) {
       throw new AppError("Failed to verify user - invalid token");
-    };
+    }
 
     user.email_verified = true;
 
-
-    await user.save()
+    await user.save();
 
     res.status(201).json({
       status: "successful",
       message: "User verified successfully",
       data: {
-        user
-      }
+        user,
+      },
     });
-
-    
   } catch (error) {
     next(error);
     res.status(404).json({
       status: "Failed",
-      message: error.message
-    })
+      message: error.message,
+    });
   }
 };
 
-
-const login = async(req, res, next) => {
-
+const login = async (req, res, next) => {
   try {
-
     const loginValidation = validateUserLogin(req.body);
 
-    if(loginValidation?.error){
-      throw new AppError(loginValidation?.error.message, 400)
+    if (loginValidation?.error) {
+      throw new AppError(loginValidation?.error.message, 400);
     }
 
-    const {email, password} = req.body;
+    const { email, password } = req.body;
 
-    if(!email || !password){
+    if (!email || !password) {
       throw new AppError("Invalid Email or Password");
-    };
+    }
 
     //check if user exist
     const user = await Users.findOne({ email }).select("+password");
 
-    if(!user){
-      throw new AppError("User not found!", 404)
-    };
+    if (!user) {
+      throw new AppError("User not found!", 404);
+    }
 
     //check if user email is verified
-    if(!user.email_verified){
+    if (!user.email_verified) {
       throw new AppError("Kindly verify email", 401);
-    };
+    }
 
     //check is user password matches the hashed password
     const isMatch = await bcrypt.compare(password, user.password);
 
-    if(!isMatch){
-      throw new AppError("Invalid login Credentails")
-    };
+    if (!isMatch) {
+      throw new AppError("Invalid login Credentails");
+    }
 
     //check for user token
-    const token = signJwt(user._id)
-
+    const token = signJwt(user._id);
 
     res.status(200).json({
       status: "success",
       data: {
-        user, 
-        token
-      }
+        user,
+        token,
+      },
     });
-
-    
   } catch (error) {
     next(error);
     res.status(404).json({
       status: "failed",
-      message: error.message
-    })
+      message: error.message,
+    });
   }
-
-}
-
+};
 
 module.exports = {
   signUp,
   verifyEmailAddress,
-  login
+  login,
 };
