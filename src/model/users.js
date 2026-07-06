@@ -44,7 +44,11 @@ const userSchema = new mongoose.Schema({
 
 
 
-})
+});
+
+userSchema.methods.getFullName = function(){
+    return `${this.firstname} ${this.lastname}`
+}
 
 const Users = mongoose.model("Users", userSchema)
 

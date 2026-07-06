@@ -202,6 +202,8 @@ const login = async (req, res, next) => {
   }
 };
 
+//forgot-password
+
 module.exports = {
   signUp,
   verifyEmailAddress,

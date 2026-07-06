@@ -2,7 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan")
 
-const authRoutes = require("./src/routes/authRoute.js")
+const authRoutes = require("./src/routes/authRoute.js");
+const userRoutes = require("./src/routes/userRoute.js")
 const app = express();
 
 app.use(express.json());
@@ -28,7 +29,8 @@ app.get("/api/v1", (req, res) => {
 
 //endpoint
 
-app.use("/api/v1/auth", authRoutes)
+app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/users", userRoutes)
 
 
 module.exports = app;
