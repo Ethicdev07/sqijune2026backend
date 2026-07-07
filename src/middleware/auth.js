@@ -6,7 +6,6 @@ const protectRoute = async (req, res, next) => {
   try {
     let token;
     console.log(token);
-    
 
     if (
       req.headers.authorization &&
@@ -36,17 +35,17 @@ const protectRoute = async (req, res, next) => {
 const verifyIsAdmin = async (req, res, next) => {
   try {
     if (req.user.role !== "admin") {
-      return next(new AppError(
-        "You are not authorized to access this route, this route belongs to admin",
-        403
-      ));
+      return next(
+        new AppError(
+          "You are not authorized to access this route, this route belongs to admin",
+          403,
+        ),
+      );
     }
     next();
   } catch (error) {
     next(new AppError("Failed to verify admin status", 500));
   }
 };
-
-;
 
 module.exports = { protectRoute, verifyIsAdmin };
