@@ -40,6 +40,9 @@ const userSchema = new mongoose.Schema({
 
     verification_token: {
         type: String
+    },
+    bio: {
+        type: String
     }
 
 

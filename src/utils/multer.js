@@ -23,11 +23,11 @@ const imageUploads = multer({
       "Error: File upload only supports the following filetypes - " + filetypes,
     );
   },
-}).single("image");
+}).single("profile_image");
 
 const dUri = new DataUri();
 
-const dataUri = (req) =>
-  dUri.format(path.extname(req.file.originalname).toString(), req.file.buffer);
+const dataUri = (file) =>
+  dUri.format(path.extname(file.originalname).toString(), file.buffer);
 
 module.exports = { dataUri, imageUploads };
