@@ -1,6 +1,7 @@
 const Users = require("./../model/users");
 const AppError = require("./../utils/AppError");
-
+const {dataUri} = require("./../utils/multer");
+const {uploader} = require("./../utils/cloudinary")
 
 const getAllUsers = async(req, res, next)=> {
     try {
@@ -55,9 +56,11 @@ const getUserProfile = async(req, res, next)=>{
 };
 
 
+
 //update-password
 
 module.exports = {
     getAllUsers,
-    getUserProfile
+    getUserProfile,
+   
 }

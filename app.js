@@ -1,17 +1,15 @@
 const express = require("express");
 const cors = require("cors");
-const morgan = require("morgan")
-
+const morgan = require("morgan");
+const errorHandler = require("./src/middleware/error");
 const authRoutes = require("./src/routes/authRoute.js");
-const userRoutes = require("./src/routes/userRoute.js")
+const userRoutes = require("./src/routes/userRoute.js");
 const app = express();
 
 app.use(express.json());
-
 app.use(express.urlencoded({ extended: true }));
-app.use(morgan("dev"))
-
-app.use(cors("*"));
+app.use(morgan("dev"));
+app.use(cors());
 
 app.get("/", (req, res) => {
   res.status(200).json({
@@ -30,7 +28,9 @@ app.get("/api/v1", (req, res) => {
 //endpoint
 
 app.use("/api/v1/auth", authRoutes);
-app.use("/api/v1/users", userRoutes)
+app.use("/api/v1/users", userRoutes);
 
+// Error handler middleware (must be after all routes)
+app.use(errorHandler);
 
 module.exports = app;
