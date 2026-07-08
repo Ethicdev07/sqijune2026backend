@@ -23,7 +23,7 @@ const imageUploads = multer({
       "Error: File upload only supports the following filetypes - " + filetypes,
     );
   },
-}).single("profile_image");
+}).single("image");
 
 const dUri = new DataUri();
 
