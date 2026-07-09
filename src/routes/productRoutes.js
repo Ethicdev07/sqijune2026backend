@@ -1,5 +1,5 @@
 
-const { createNewProduct, getAllProducts } = require("./../controllers/productController");
+const { createNewProduct, getAllProducts, getProductDetails, updateProduct, deleteProduct } = require("./../controllers/productController");
 
 const express = require("express");
 
@@ -14,5 +14,10 @@ const router = express.Router();
 router.route("/")
 .get(getAllProducts)
 .post(authMiddleware.protectRoute, cloudinaryConfig, imageUploads, createNewProduct);
+
+router.route("/:id")
+.get(authMiddleware.protectRoute, getProductDetails)
+.patch(authMiddleware.protectRoute, updateProduct)
+.delete(authMiddleware.protectRoute, deleteProduct);
 
 module.exports = router;
