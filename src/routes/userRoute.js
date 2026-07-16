@@ -21,5 +21,8 @@ router.route("/update-profile-picture").patch(
     userController.updateProfilePicture
 )
 
+router.route("/update-password")
+  .patch(authMiddleware.protectRoute, userController.updatePassword);
+
 
 module.exports = router;

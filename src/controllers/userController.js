@@ -128,11 +128,65 @@ const updateProfile = async(req, res, next)=>{
     } catch (error) {
         next(error)
     }
-}
+};
+
+const updatePassword = async (req, res, next) => {
+  try {
+    const userId = req.user._id;
+    const user = await Users.findById(userId).select("+password");
+    if (!user) {
+      throw new AppError(`User not found with id of ${id}`, 404);
+    }
+    const { oldPassword, newPassword, confirmNewPassword } = req.body;
+    if (!oldPassword || !newPassword || !confirmNewPassword) {
+      throw new AppError(
+        "Please provide both old and new and confirm password",
+        400
+      );
+    }
+    const isPasswordValid = await user.comparePassword(
+      oldPassword,
+      user.password
+    );
+    if (!isPasswordValid) {
+      throw new AppError("Old password is incorrect", 400);
+    }
+
+    if (oldPassword === newPassword) {
+      throw new AppError(
+        "New password cannot be the same as old password",
+        400
+      );
+    }
+
+    if (newPassword !== confirmNewPassword) {
+      throw new AppError(
+        "New password and confirm new password do not match",
+        400
+      );
+    }
+    const salt = await bcrypt.genSalt(12);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    user.password = hashedPassword;
+    console.log();
+    await user.save();
+    res.status(200).json({
+      status: "success",
+      message: "Password updated successfully",
+      data: {
+        user,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 module.exports = {
   getAllUsers,
   getUserProfile,
   updateProfilePicture,
-  updateProfile
+  updateProfile,
+  updatePassword
 };
